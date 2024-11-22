@@ -1,0 +1,64 @@
+[educationalsp]2024/11/22 13:46:50 main.go:16: Hey, I started!
+[educationalsp]2024/11/22 13:46:50 main.go:37: Received msg with method: initialize
+[educationalsp]2024/11/22 13:46:50 main.go:46: Connected to: Neovim 0.10.0-dev+v0.10.0
+[educationalsp]2024/11/22 13:46:50 main.go:54: Sent the reply
+[educationalsp]2024/11/22 13:46:50 main.go:37: Received msg with method: initialized
+[educationalsp]2024/11/22 13:46:50 main.go:37: Received msg with method: textDocument/didOpen
+[educationalsp]2024/11/22 13:46:50 main.go:62: Opened: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:46:51 main.go:37: Received msg with method: textDocument/codeAction
+[educationalsp]2024/11/22 13:46:51 main.go:115: textDocument/codeAction: "R D R' D'// comment :)\nR U R' U' // comment 2\nM E M' E' // final comment\n"
+[educationalsp]2024/11/22 13:46:51 main.go:118: textDocument/codeAction: {"start":{"line":0,"character":0},"end":{"line":0,"character":0}}
+[educationalsp]2024/11/22 13:46:51 main.go:125: Replied to textDocument/codeAction: map[file:///home/xande/projects/recons/test.recon:[{{{0 0} {0 9}} L' D' L D} {{{1 0} {1 10}} L' U' L U } {{{2 0} {2 10}} M E' M' E }]]
+[educationalsp]2024/11/22 13:46:52 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:46:52 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:46:53 main.go:37: Received msg with method: textDocument/codeAction
+[educationalsp]2024/11/22 13:46:53 main.go:115: textDocument/codeAction: "L' D' L D// comment :)\nL' U' L U // comment 2\nM E' M' E // final comment\n"
+[educationalsp]2024/11/22 13:46:53 main.go:118: textDocument/codeAction: {"start":{"line":0,"character":0},"end":{"line":0,"character":0}}
+[educationalsp]2024/11/22 13:46:53 main.go:125: Replied to textDocument/codeAction: map[file:///home/xande/projects/recons/test.recon:[{{{0 0} {0 9}} R D R' D'} {{{1 0} {1 10}} R U R' U' } {{{2 0} {2 10}} M E M' E' }]]
+[educationalsp]2024/11/22 13:46:54 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:46:54 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:46:54 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:46:54 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:46:54 main.go:37: Received msg with method: textDocument/codeAction
+[educationalsp]2024/11/22 13:46:54 main.go:115: textDocument/codeAction: "L U L' U'// comment :)\nL D L' D' // comment 2\nM' E' M E // final comment\n"
+[educationalsp]2024/11/22 13:46:54 main.go:118: textDocument/codeAction: {"start":{"line":0,"character":0},"end":{"line":0,"character":0}}
+[educationalsp]2024/11/22 13:46:54 main.go:125: Replied to textDocument/codeAction: map[file:///home/xande/projects/recons/test.recon:[{{{0 0} {0 9}} R' U' R U} {{{1 0} {1 10}} R' D' R D } {{{2 0} {2 10}} M' E M E' }]]
+[educationalsp]2024/11/22 13:46:55 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:46:55 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:46:55 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:46:55 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:46:59 main.go:37: Received msg with method: textDocument/codeAction
+[educationalsp]2024/11/22 13:46:59 main.go:115: textDocument/codeAction: "L' U' L U// comment :)\nL' D' L D // comment 2\nM E M' E' // final comment\n"
+[educationalsp]2024/11/22 13:46:59 main.go:118: textDocument/codeAction: {"start":{"line":1,"character":0},"end":{"line":1,"character":22}}
+[educationalsp]2024/11/22 13:46:59 main.go:125: Replied to textDocument/codeAction: map[file:///home/xande/projects/recons/test.recon:[{{{1 0} {1 10}} R D R' D' }]]
+[educationalsp]2024/11/22 13:47:00 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:00 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:06 main.go:37: Received msg with method: textDocument/codeAction
+[educationalsp]2024/11/22 13:47:06 main.go:115: textDocument/codeAction: "L' U' L U// comment :)\nR D R' D' // comment 2\nM E M' E' // final comment\n"
+[educationalsp]2024/11/22 13:47:06 main.go:118: textDocument/codeAction: {"start":{"line":0,"character":0},"end":{"line":0,"character":4}}
+[educationalsp]2024/11/22 13:47:06 main.go:125: Replied to textDocument/codeAction: map[file:///home/xande/projects/recons/test.recon:[{{{0 0} {0 5}} R U}]]
+[educationalsp]2024/11/22 13:47:08 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:08 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:12 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:12 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:12 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:12 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:12 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:12 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:12 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:12 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:14 main.go:37: Received msg with method: textDocument/codeAction
+[educationalsp]2024/11/22 13:47:14 main.go:115: textDocument/codeAction: "R U L U    // comment :)\nR D R' D' // comment 2\nM E M' E' // final comment\n"
+[educationalsp]2024/11/22 13:47:14 main.go:118: textDocument/codeAction: {"start":{"line":0,"character":0},"end":{"line":0,"character":24}}
+[educationalsp]2024/11/22 13:47:14 main.go:125: Replied to textDocument/codeAction: map[file:///home/xande/projects/recons/test.recon:[{{{0 0} {0 11}} L' U' R' U'    }]]
+[educationalsp]2024/11/22 13:47:15 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:15 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:17 main.go:37: Received msg with method: textDocument/codeAction
+[educationalsp]2024/11/22 13:47:17 main.go:115: textDocument/codeAction: "L' U' R' U'    // comment :)\nR D R' D' // comment 2\nM E M' E' // final comment\n"
+[educationalsp]2024/11/22 13:47:17 main.go:118: textDocument/codeAction: {"start":{"line":0,"character":10},"end":{"line":0,"character":10}}
+[educationalsp]2024/11/22 13:47:17 main.go:125: Replied to textDocument/codeAction: map[file:///home/xande/projects/recons/test.recon:[{{{0 0} {0 15}} R U L U    } {{{1 0} {1 10}} L' D' L D } {{{2 0} {2 10}} M E' M' E }]]
+[educationalsp]2024/11/22 13:47:21 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:21 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:21 main.go:37: Received msg with method: textDocument/didChange
+[educationalsp]2024/11/22 13:47:21 main.go:81: Changed: file:///home/xande/projects/recons/test.recon
+[educationalsp]2024/11/22 13:47:56 main.go:37: Received msg with method: shutdown
