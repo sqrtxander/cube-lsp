@@ -3,10 +3,9 @@ package analysis
 import (
 	"cubelsp/analysis/codeaction"
 	"cubelsp/analysis/diagnostic"
+	"cubelsp/analysis/hover"
 	"cubelsp/analysis/utils"
-	"cubelsp/cube"
 	"cubelsp/lsp"
-	"fmt"
 	"strings"
 )
 
@@ -24,7 +23,7 @@ func getDiagnosticsForFile(text string) []lsp.Diagnostic {
 	diagnostics := []lsp.Diagnostic{}
 	diagnosticGetter := diagnostic.NewDiagnosticGetter()
 	for row, line := range strings.Split(text, "\n") {
-        line = utils.RemoveComment(line)
+		line = utils.RemoveComment(line)
 		newDiagnostics, _ := diagnosticGetter.GetDiagnostics(row, line)
 		diagnostics = append(diagnostics, newDiagnostics...)
 	}
@@ -42,52 +41,25 @@ func (s *State) UpdateDocument(uri, text string) []lsp.Diagnostic {
 }
 
 func (s *State) Hover(id int, uri string, position lsp.Position) lsp.HoverResponse {
-	document := s.Documents[uri]
-
-	documentLines := strings.Split(document, "\n")[:position.Line+1]
-	lastIdx := 0
-	lastLine := documentLines[position.Line]
-	if lastLine != "" {
-		lastLine = lastLine[position.Character:] + " "
-		lastIdx = position.Character + max(strings.Index(lastLine, " "), 0)
-	}
-	documentLines[position.Line] = documentLines[position.Line][:lastIdx]
-
-	moves := ""
-	for _, line := range documentLines {
-        line = utils.RemoveComment(line)
-        if utils.IsKeyOtherThan(line, "scramble") {
-			continue
-		}
-        line = utils.RemoveKey(line)
-		moves += line + " "
-	}
-
-	cubeState, err := cube.DoMoves(*cube.GetSolvedCube(), moves)
-	contents := ""
-	if err == nil {
-		contents = fmt.Sprintf("State at cursor:\n%s", cube.ToFatString(*cubeState, cube.ToNetString))
-	}
+	text := s.Documents[uri]
+	result := hover.GetHoverResult(text, position)
 
 	return lsp.HoverResponse{
 		Response: lsp.Response{
 			RPC: "2.0",
 			ID:  &id,
 		},
-		Result: lsp.HoverResult{
-			Contents: contents,
-		},
+		Result: result,
 	}
 }
 
 func (s *State) TextDocumentCodeAction(id int, params lsp.TextDocumentCodeActionParams) lsp.TextDocumentCodeActionResponse {
-    uri := params.TextDocument.URI
-    ran := params.Range
+	uri := params.TextDocument.URI
+	ran := params.Range
 	text := s.Documents[uri]
-	_ = text
 
 	actions := []lsp.CodeAction{}
-    actions = append(actions, codeaction.GetReplaceActions(text, uri, ran)...)
+	actions = append(actions, codeaction.GetReplaceActions(text, uri, ran)...)
 
 	response := lsp.TextDocumentCodeActionResponse{
 		Response: lsp.Response{
