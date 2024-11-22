@@ -9,7 +9,7 @@ type DiagnosticGetter struct {
 func NewDiagnosticGetter() *DiagnosticGetter {
 	dg := &DiagnosticGetter{}
 	current := &PreambleStrat{diagnosticGetter: dg}
-    dg.currentState = current
+	dg.currentState = current
 	return dg
 }
 

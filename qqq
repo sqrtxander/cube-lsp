@@ -1,0 +1,243 @@
+[1mdiff --git a/analysis/diagnostic/diagnosticGetter.go b/analysis/diagnostic/diagnosticGetter.go[m
+[1mindex 278e4f8..1a4957a 100644[m
+[1m--- a/analysis/diagnostic/diagnosticGetter.go[m
+[1m+++ b/analysis/diagnostic/diagnosticGetter.go[m
+[36m@@ -9,7 +9,7 @@[m [mtype DiagnosticGetter struct {[m
+ func NewDiagnosticGetter() *DiagnosticGetter {[m
+ 	dg := &DiagnosticGetter{}[m
+ 	current := &PreambleStrat{diagnosticGetter: dg}[m
+[31m-    dg.currentState = current[m
+[32m+[m	[32mdg.currentState = current[m
+ 	return dg[m
+ }[m
+ [m
+[1mdiff --git a/analysis/diagnostic/preambleStrat.go b/analysis/diagnostic/preambleStrat.go[m
+[1mindex 8879221..e3b87fa 100644[m
+[1m--- a/analysis/diagnostic/preambleStrat.go[m
+[1m+++ b/analysis/diagnostic/preambleStrat.go[m
+[36m@@ -1,6 +1,7 @@[m
+ package diagnostic[m
+ [m
+ import ([m
+[32m+[m	[32m"cubelsp/analysis/globs"[m
+ 	"cubelsp/analysis/utils"[m
+ 	"cubelsp/lsp"[m
+ 	"fmt"[m
+[36m@@ -13,17 +14,16 @@[m [mtype PreambleStrat struct {[m
+ }[m
+ [m
+ var validKeys = []string{[m
+[31m-	"scramble",[m
+[31m-	"time",[m
+[32m+[m	[32mglobs.SCRAMBLE,[m
+[32m+[m	[32mglobs.TIME,[m
+ }[m
+ [m
+[31m-[m
+ func (s *PreambleStrat) getDiagnostics(row int, line string) ([]lsp.Diagnostic, error) {[m
+[31m-	if !strings.Contains(line, ":") {[m
+[32m+[m	[32mif !utils.IsKey(line) {[m
+ 		s.diagnosticGetter.setStrategy([m
+ 			&ReconStrat{diagnosticGetter: s.diagnosticGetter},[m
+ 		)[m
+[31m-        return s.diagnosticGetter.GetDiagnostics(row, line)[m
+[32m+[m		[32mreturn s.diagnosticGetter.GetDiagnostics(row, line)[m
+ 	}[m
+ 	diagnostics := []lsp.Diagnostic{}[m
+ 	key, value, _ := strings.Cut(line, ":")[m
+[36m@@ -32,10 +32,10 @@[m [mfunc (s *PreambleStrat) getDiagnostics(row int, line string) ([]lsp.Diagnostic,[m
+ 			Range:    utils.LineRange(row, 0, len(key)),[m
+ 			Severity: 1,[m
+ 			Source:   "cubelsp",[m
+[31m-			Message:  fmt.Sprintf("Unknown key `%s`", key),[m
+[32m+[m			[32mMessage:  fmt.Sprintf("Invalid key `%s`", key),[m
+ 		})[m
+[31m-	} else if key == "scramble" {[m
+[31m-        diagnostics = append(diagnostics, validateNotation(row, value, len("scramble:"))...);[m
+[31m-    }[m
+[32m+[m	[32m} else if key == globs.SCRAMBLE {[m
+[32m+[m		[32mdiagnostics = append(diagnostics, validateNotation(row, value, len(globs.SCRAMBLE)+1)...)[m
+[32m+[m	[32m}[m
+ 	return diagnostics, nil[m
+ }[m
+[1mdiff --git a/analysis/diagnostic/reconStrat.go b/analysis/diagnostic/reconStrat.go[m
+[1mindex d674a98..ef6d905 100644[m
+[1m--- a/analysis/diagnostic/reconStrat.go[m
+[1m+++ b/analysis/diagnostic/reconStrat.go[m
+[36m@@ -9,5 +9,5 @@[m [mtype ReconStrat struct {[m
+ }[m
+ [m
+ func (s *ReconStrat) getDiagnostics(row int, line string) ([]lsp.Diagnostic, error) {[m
+[31m-    return validateNotation(row, line, 0), nil[m
+[32m+[m	[32mreturn validateNotation(row, line, 0), nil[m
+ }[m
+[1mdiff --git a/analysis/diagnostic/state.go b/analysis/diagnostic/state.go[m
+[1mindex eb3b9a8..af9094e 100644[m
+[1m--- a/analysis/diagnostic/state.go[m
+[1m+++ b/analysis/diagnostic/state.go[m
+[36m@@ -3,5 +3,5 @@[m [mpackage diagnostic[m
+ import "cubelsp/lsp"[m
+ [m
+ type Strategy interface {[m
+[31m-    getDiagnostics(int, string) ([]lsp.Diagnostic, error)[m
+[32m+[m	[32mgetDiagnostics(int, string) ([]lsp.Diagnostic, error)[m
+ }[m
+[1mdiff --git a/analysis/utils/validation.go b/analysis/utils/validation.go[m
+[1mindex ce1ea55..c083b60 100644[m
+[1m--- a/analysis/utils/validation.go[m
+[1m+++ b/analysis/utils/validation.go[m
+[36m@@ -3,6 +3,8 @@[m [mpackage utils[m
+ import ([m
+ 	"fmt"[m
+ 	"slices"[m
+[32m+[m	[32m"strconv"[m
+[32m+[m	[32m"strings"[m
+ )[m
+ [m
+ var ValidFaces = []byte{[m
+[36m@@ -14,26 +16,39 @@[m [mvar ValidFaces = []byte{[m
+ var ValidAmounts = []byte{'2', '\''}[m
+ [m
+ // IsValidMove determines if a move is valid. The move passed in must[m
+[31m-// be a string with no spaces for the returned string to make sense.[m
+[32m+[m[32m// be a string with no whitespace for the returned string to make sense.[m
+ //[m
+ // returns a boolean whether the move is valid and a string as to why[m
+ // the move is invalid.[m
+ func IsValidMove(move string) (bool, string) {[m
+[31m-    if len(move) == 0 {[m
+[31m-        return false, "This is unexpected, should never occur with this lsp"[m
+[31m-    }[m
+[32m+[m	[32m// valid e.g., R2, M', U3, U2', U42[m
+[32m+[m	[32m// invalid e.g., R'2, P, F0[m
+ [m
+[31m-    if len(move) > 2 {[m
+[31m-        return false, fmt.Sprintf("Move '%s' too long", move)[m
+[31m-    }[m
+[32m+[m	[32mif len(move) == 0 {[m
+[32m+[m		[32mreturn false, "If you are seeing this, an error occurred because this should be unreachable"[m
+[32m+[m	[32m}[m
+ [m
+[31m-    if !slices.Contains(ValidFaces, move[0]) {[m
+[31m-        return false, fmt.Sprintf("Invalid face in move '%s'", move)[m
+[31m-    }[m
+[32m+[m	[32mif !slices.Contains(ValidFaces, move[0]) {[m
+[32m+[m		[32mreturn false, fmt.Sprintf("Invalid face in move '%s'", move)[m
+[32m+[m	[32m}[m
+ [m
+[31m-    if len(move) == 2 && !slices.Contains(ValidAmounts, move[1]) {[m
+[31m-        return false, fmt.Sprintf("Invalid amount in move '%s'", move)[m
+[31m-    }[m
+[32m+[m	[32mif len(move) == 1 {[m
+[32m+[m		[32mreturn true, ""[m
+[32m+[m	[32m}[m
+ [m
+[31m-    return true, ""[m
+[32m+[m	[32mamountStr := move[1:][m
+[32m+[m	[32mif strings.HasSuffix(amountStr, "'") {[m
+[32m+[m		[32mamountStr = amountStr[:len(amountStr)-1][m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mif amountStr == "" {[m
+[32m+[m		[32mreturn true, ""[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mamount, err := strconv.Atoi(amountStr)[m
+[32m+[m	[32mif err != nil || amount <= 0 {[m
+[32m+[m		[32mreturn false, fmt.Sprintf("Invalid amount in move '%s'", move)[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mreturn true, ""[m
+ }[m
+[1mdiff --git a/cube/cube3.go b/cube/cube3.go[m
+[1mindex e88a918..f1fca57 100644[m
+[1m--- a/cube/cube3.go[m
+[1m+++ b/cube/cube3.go[m
+[36m@@ -3,6 +3,7 @@[m [mpackage cube[m
+ import ([m
+ 	"encoding/json"[m
+ 	"fmt"[m
+[32m+[m	[32m"strconv"[m
+ 	"strings"[m
+ [m
+ 	"github.com/google/go-cmp/cmp"[m
+[36m@@ -75,29 +76,35 @@[m [mfunc DoMoves(on Cube, moves string) (*Cube, error) {[m
+ }[m
+ [m
+ func DoMove(on Cube, move string) (*Cube, error) {[m
+[31m-	if len(move) == 0 {[m
+[32m+[m	[32mif move == "" {[m
+ 		return nil, fmt.Errorf("DoMove: Empty move supplied: %s", move)[m
+ 	}[m
+ [m
+[31m-	if len(move) > 2 {[m
+[31m-		return nil, fmt.Errorf("DoMove: Move too long: %s", move)[m
+[31m-	}[m
+[31m-[m
+ 	face := move[0][m
+ 	turns := 1[m
+[31m-	if len(move) == 2 {[m
+[31m-		switch move[1] {[m
+[31m-		case '2':[m
+[31m-			turns = 2[m
+[31m-			break[m
+[31m-		case '\'':[m
+[31m-			turns = 3[m
+[31m-			break[m
+[31m-		default:[m
+[31m-			return nil, fmt.Errorf("DoMove: Unknown move amount, %c", move[1])[m
+[31m-		}[m
+[32m+[m	[32mif len(move) == 1 {[m
+[32m+[m		[32mreturn doMoveFaceTurns(on, face, 1)[m
+ 	}[m
+ [m
+[32m+[m	[32mamountStr := move[1:][m
+[32m+[m	[32mamountStrSans := amountStr[m
+[32m+[m	[32mif strings.HasSuffix(amountStr, "'") {[m
+[32m+[m		[32mturns = -1[m
+[32m+[m		[32mamountStrSans = amountStr[:len(amountStr)-1][m
+[32m+[m	[32m}[m
+[32m+[m	[32mif amountStrSans == "" {[m
+[32m+[m		[32mreturn doMoveFaceTurns(on, face, 3)[m
+[32m+[m	[32m}[m
+[32m+[m	[32mamount, err := strconv.Atoi(amountStrSans)[m
+[32m+[m	[32mif err != nil || amount == 0 {[m
+[32m+[m		[32mreturn nil, fmt.Errorf("DoMove: Invalid amount '%s' in move '%s'", amountStr, move)[m
+[32m+[m	[32m}[m
+[32m+[m	[32mturns *= amount[m
+[32m+[m	[32mturns = (turns%4 + 4) % 4[m
+[32m+[m	[32mreturn doMoveFaceTurns(on, face, turns)[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunc doMoveFaceTurns(on Cube, face byte, turns int) (*Cube, error) {[m
+ 	for i := 0; i < turns; i++ {[m
+ 		switch face {[m
+ 		case 'U':[m
+[36m@@ -155,7 +162,7 @@[m [mfunc DoMove(on Cube, move string) (*Cube, error) {[m
+ 			on = *multiply(on, moves[17])[m
+ 			break[m
+ 		default:[m
+[31m-			return nil, fmt.Errorf("DoMove: Unknown face, %c", face)[m
+[32m+[m			[32mreturn nil, fmt.Errorf("DoMove: Invalid face '%c' in move", face)[m
+ 		}[m
+ 	}[m
+ [m
+[36m@@ -167,15 +174,15 @@[m [mfunc IsSolved(cube Cube) bool {[m
+ }[m
+ [m
+ func IsCrossSolved(cube Cube) bool {[m
+[31m-    cubep := &cube[m
+[32m+[m	[32mcubep := &cube[m
+ 	for i := 0; i < 2; i++ {[m
+ 		for j := 0; j < 3; j++ {[m
+ 			if isCrossSolvedD(cube) {[m
+ 				return true[m
+ 			}[m
+[31m-            cubep, _ = DoMoves(*cubep, "x y")[m
+[32m+[m			[32mcubep, _ = DoMoves(*cubep, "x y")[m
+ 		}[m
+[31m-        cubep, _ = DoMoves(*cubep, "y2 x")[m
+[32m+[m		[32mcubep, _ = DoMoves(*cubep, "y2 x")[m
+ 	}[m
+ 	return false[m
+ }[m

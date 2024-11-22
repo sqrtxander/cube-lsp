@@ -3,6 +3,7 @@ package cube
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
@@ -75,29 +76,35 @@ func DoMoves(on Cube, moves string) (*Cube, error) {
 }
 
 func DoMove(on Cube, move string) (*Cube, error) {
-	if len(move) == 0 {
+	if move == "" {
 		return nil, fmt.Errorf("DoMove: Empty move supplied: %s", move)
-	}
-
-	if len(move) > 2 {
-		return nil, fmt.Errorf("DoMove: Move too long: %s", move)
 	}
 
 	face := move[0]
 	turns := 1
-	if len(move) == 2 {
-		switch move[1] {
-		case '2':
-			turns = 2
-			break
-		case '\'':
-			turns = 3
-			break
-		default:
-			return nil, fmt.Errorf("DoMove: Unknown move amount, %c", move[1])
-		}
+	if len(move) == 1 {
+		return doMoveFaceTurns(on, face, 1)
 	}
 
+	amountStr := move[1:]
+	amountStrSans := amountStr
+	if strings.HasSuffix(amountStr, "'") {
+		turns = -1
+		amountStrSans = amountStr[:len(amountStr)-1]
+	}
+	if amountStrSans == "" {
+		return doMoveFaceTurns(on, face, 3)
+	}
+	amount, err := strconv.Atoi(amountStrSans)
+	if err != nil || amount == 0 {
+		return nil, fmt.Errorf("DoMove: Invalid amount '%s' in move '%s'", amountStr, move)
+	}
+	turns *= amount
+	turns = (turns%4 + 4) % 4
+	return doMoveFaceTurns(on, face, turns)
+}
+
+func doMoveFaceTurns(on Cube, face byte, turns int) (*Cube, error) {
 	for i := 0; i < turns; i++ {
 		switch face {
 		case 'U':
@@ -155,7 +162,7 @@ func DoMove(on Cube, move string) (*Cube, error) {
 			on = *multiply(on, moves[17])
 			break
 		default:
-			return nil, fmt.Errorf("DoMove: Unknown face, %c", face)
+			return nil, fmt.Errorf("DoMove: Invalid face '%c' in move", face)
 		}
 	}
 
@@ -167,15 +174,15 @@ func IsSolved(cube Cube) bool {
 }
 
 func IsCrossSolved(cube Cube) bool {
-    cubep := &cube
+	cubep := &cube
 	for i := 0; i < 2; i++ {
 		for j := 0; j < 3; j++ {
 			if isCrossSolvedD(cube) {
 				return true
 			}
-            cubep, _ = DoMoves(*cubep, "x y")
+			cubep, _ = DoMoves(*cubep, "x y")
 		}
-        cubep, _ = DoMoves(*cubep, "y2 x")
+		cubep, _ = DoMoves(*cubep, "y2 x")
 	}
 	return false
 }

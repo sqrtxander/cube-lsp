@@ -9,5 +9,5 @@ type ReconStrat struct {
 }
 
 func (s *ReconStrat) getDiagnostics(row int, line string) ([]lsp.Diagnostic, error) {
-    return validateNotation(row, line, 0), nil
+	return validateNotation(row, line, 0), nil
 }
