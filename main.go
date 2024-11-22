@@ -111,12 +111,6 @@ func handleMessage(logger *log.Logger, writer io.Writer, state analysis.State, m
 			return
 		}
 
-		ran := request.Params.Range
-        logger.Printf("textDocument/codeAction: %q", state.Documents[request.Params.TextDocument.URI])
-
-		res, _ := json.Marshal(ran)
-		logger.Printf("textDocument/codeAction: %s", string(res))
-
 		// Create a response
 		response := state.TextDocumentCodeAction(request.ID, request.Params)
 
